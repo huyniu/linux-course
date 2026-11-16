@@ -31,6 +31,31 @@ services:
     depends_on:
       core-db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep -q UP"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 15s
+    networks:
+      - banking-network
+
+  transaction-service:
+    build: ./transaction-service
+    container_name: transaction-service
+    ports:
+      - "8081:8081"
+    environment:
+      # Goi account-service bang ten service trong banking-network, khong dung localhost hay IP tinh
+      - ACCOUNT_SERVICE_URL=http://account-service:8080
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://core-db:5432/banking_db
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      core-db:
+        condition: service_healthy
+      account-service:
+        condition: service_healthy
     networks:
       - banking-network
 

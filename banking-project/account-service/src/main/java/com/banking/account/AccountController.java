@@ -53,4 +53,32 @@ public class AccountController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Khong tim thay tai khoan: " + accountNumber));
     }
+
+    // API noi bo cho transaction-service: tru tien tai khoan
+    @PostMapping("/{accountNumber}/debit")
+    public Account debit(@PathVariable String accountNumber, @Valid @RequestBody AmountRequest request) {
+        requireExists(accountNumber);
+        if (accountRepository.debit(accountNumber, request.amount()) == 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "So du khong du de tru " + request.amount() + " tu tai khoan " + accountNumber);
+        }
+        log.info("Da tru {} tu tai khoan {}", request.amount(), accountNumber);
+        return findByAccountNumber(accountNumber);
+    }
+
+    // API noi bo cho transaction-service: cong tien tai khoan
+    @PostMapping("/{accountNumber}/credit")
+    public Account credit(@PathVariable String accountNumber, @Valid @RequestBody AmountRequest request) {
+        requireExists(accountNumber);
+        accountRepository.credit(accountNumber, request.amount());
+        log.info("Da cong {} vao tai khoan {}", request.amount(), accountNumber);
+        return findByAccountNumber(accountNumber);
+    }
+
+    private void requireExists(String accountNumber) {
+        if (!accountRepository.existsByAccountNumber(accountNumber)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Khong tim thay tai khoan: " + accountNumber);
+        }
+    }
 }

@@ -1,0 +1,131 @@
+{
+  "info": {
+    "name": "Banking Project",
+    "description": "API cua account-service (8080) va transaction-service (8081)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "accountUrl", "value": "http://localhost:8080" },
+    { "key": "transactionUrl", "value": "http://localhost:8081" },
+    { "key": "newAccount", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Bai 2 - Tao tai khoan moi",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// Sinh so tai khoan ngau nhien de chay lai nhieu lan khong bi trung",
+              "pm.collectionVariables.set('newAccount', String(Date.now()).slice(-10));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Tao tai khoan tra ve 201', () => pm.response.to.have.status(201));",
+              "pm.test('Response co id', () => pm.expect(pm.response.json().id).to.be.a('number'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"accountNumber\": \"{{newAccount}}\",\n  \"ownerName\": \"Le Van C\",\n  \"initialBalance\": 3000000\n}"
+        },
+        "url": "{{accountUrl}}/api/accounts"
+      }
+    },
+    {
+      "name": "Bai 2/3 - Get Account",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Get account tra ve 200', () => pm.response.to.have.status(200));",
+              "pm.test('Dung so tai khoan', () => pm.expect(pm.response.json().accountNumber).to.eql(pm.collectionVariables.get('newAccount')));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{accountUrl}}/api/accounts/{{newAccount}}"
+      }
+    },
+    {
+      "name": "Bai 2 - Danh sach tai khoan",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('Tra ve 200', () => pm.response.to.have.status(200));"] }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{accountUrl}}/api/accounts"
+      }
+    },
+    {
+      "name": "Bai 4 - Chuyen tien",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Chuyen tien tra ve 201', () => pm.response.to.have.status(201));",
+              "pm.test('Trang thai SUCCESS', () => pm.expect(pm.response.json().status).to.eql('SUCCESS'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fromAccount\": \"{{newAccount}}\",\n  \"toAccount\": \"1000000001\",\n  \"amount\": 50000\n}"
+        },
+        "url": "{{transactionUrl}}/api/transactions/transfer"
+      }
+    },
+    {
+      "name": "Bai 4 - Chuyen tien tu tai khoan khong ton tai",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('Tra ve 404', () => pm.response.to.have.status(404));"] }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fromAccount\": \"9999999999\",\n  \"toAccount\": \"1000000001\",\n  \"amount\": 50000\n}"
+        },
+        "url": "{{transactionUrl}}/api/transactions/transfer"
+      }
+    },
+    {
+      "name": "Bai 4 - Lich su giao dich",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('Tra ve 200', () => pm.response.to.have.status(200));"] }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{transactionUrl}}/api/transactions"
+      }
+    }
+  ]
+}
