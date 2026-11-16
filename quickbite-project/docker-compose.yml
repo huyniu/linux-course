@@ -1,0 +1,69 @@
+services:
+  quickbite-user:
+    image: quickbite-user-service:latest
+    build: ./user-service
+    container_name: quickbite-user
+    ports:
+      - "${USER_SERVER_PORT}:${USER_SERVER_PORT}"
+    environment:
+      - SERVER_PORT=${USER_SERVER_PORT}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${USER_DB_NAME}
+      - DB_USERNAME=${USER_DB_USERNAME}
+      - DB_PASSWORD=${USER_DB_PASSWORD}
+    networks:
+      - quickbite-net
+
+  quickbite-restaurant:
+    image: quickbite-restaurant-service:latest
+    build: ./restaurant-service
+    container_name: quickbite-restaurant
+    ports:
+      - "${RESTAURANT_SERVER_PORT}:${RESTAURANT_SERVER_PORT}"
+    environment:
+      - SERVER_PORT=${RESTAURANT_SERVER_PORT}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${RESTAURANT_DB_NAME}
+      - DB_USERNAME=${RESTAURANT_DB_USERNAME}
+      - DB_PASSWORD=${RESTAURANT_DB_PASSWORD}
+    networks:
+      - quickbite-net
+
+  quickbite-order:
+    image: quickbite-order-service:latest
+    build: ./order-service
+    container_name: quickbite-order
+    ports:
+      - "${ORDER_SERVER_PORT}:${ORDER_SERVER_PORT}"
+    environment:
+      - SERVER_PORT=${ORDER_SERVER_PORT}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${ORDER_DB_NAME}
+      - DB_USERNAME=${ORDER_DB_USERNAME}
+      - DB_PASSWORD=${ORDER_DB_PASSWORD}
+    networks:
+      - quickbite-net
+
+  quickbite-notification:
+    image: quickbite-notification-service:latest
+    build: ./notification-service
+    container_name: quickbite-notification
+    ports:
+      - "${NOTIFICATION_SERVER_PORT}:${NOTIFICATION_SERVER_PORT}"
+    environment:
+      - SERVER_PORT=${NOTIFICATION_SERVER_PORT}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${NOTIFICATION_DB_NAME}
+      - DB_USERNAME=${NOTIFICATION_DB_USERNAME}
+      - DB_PASSWORD=${NOTIFICATION_DB_PASSWORD}
+    networks:
+      - quickbite-net
+
+networks:
+  # Mang ngoai da tao san, dung chung voi container database quickbite-db
+  quickbite-net:
+    external: true
