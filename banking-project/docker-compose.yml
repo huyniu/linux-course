@@ -14,9 +14,9 @@ services:
       timeout: 3s
       retries: 10
 
-  banking-app:
+  account-service:
     build: ./account-service
-    container_name: banking-app
+    container_name: account-service
     ports:
       - "8080:8080"
     environment:
