@@ -6,13 +6,17 @@ services:
       - POSTGRES_DB=banking_db
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
-    ports:
-      - "5432:5432"
+    # Khong map cong 5432 ra host: chi cac service trong banking-network moi truy cap duoc DB
+    volumes:
+      # Du lieu PostgreSQL luu tren named volume, khong mat khi xoa container
+      - pg-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d banking_db"]
       interval: 5s
       timeout: 3s
       retries: 10
+    networks:
+      - banking-network
 
   account-service:
     build: ./account-service
@@ -27,3 +31,14 @@ services:
     depends_on:
       core-db:
         condition: service_healthy
+    networks:
+      - banking-network
+
+networks:
+  banking-network:
+    name: banking-network
+    driver: bridge
+
+volumes:
+  pg-data:
+    name: pg-data
