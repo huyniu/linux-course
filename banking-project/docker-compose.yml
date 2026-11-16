@@ -1,0 +1,29 @@
+services:
+  core-db:
+    image: postgres:15-alpine
+    container_name: core-db
+    environment:
+      - POSTGRES_DB=banking_db
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d banking_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  banking-app:
+    build: ./account-service
+    container_name: banking-app
+    ports:
+      - "8080:8080"
+    environment:
+      # Dung ten service 'core-db' lam hostname, khong dung localhost
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://core-db:5432/banking_db
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      core-db:
+        condition: service_healthy
