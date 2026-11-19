@@ -30,5 +30,8 @@ services:
       - /tmp/runner:/tmp/runner
       # Cong cu cai san: JDK 17 cua host (chi doc)
       - /usr/lib/jvm/java-17-openjdk-amd64:/opt/jdk-17:ro
-      # Bo dem Gradle (wrapper + thu vien) dung chung giua cac lan build
-      - /root/.gradle:/root/.gradle
+      # JDK cua Ubuntu tro file cau hinh bao mat (java.security) sang /etc, can mount kem
+      - /etc/java-17-openjdk:/etc/java-17-openjdk:ro
+      # Bo dem Gradle (wrapper + thu vien) giu lai giua cac lan build. Dung thu muc rieng cho runner,
+      # khong dung chung ~/.gradle cua host vi Gradle khong khoa file duoc giua cac tien trinh khac container.
+      - /opt/runner-cache/gradle:/root/.gradle
