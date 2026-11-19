@@ -12,11 +12,16 @@ jobs:
       run:
         working-directory: cicd/cart-service
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version: 17
           distribution: temurin
+      # Loi goc: gradlew duoc commit tu Windows nen mat quyen thuc thi (mode 100644)
+      # -> buoc build bao "Permission denied", exit code 126.
+      # Da sua mode trong Git thanh 100755; buoc nay giu lai de an toan neu file bi mat quyen lan nua.
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
       - name: Build with Gradle
         run: ./gradlew bootJar
