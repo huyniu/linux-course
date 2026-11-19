@@ -15,7 +15,7 @@ class PaymentFeeCalculatorTests {
 
     @Test
     void cardFeeIsTwoPercent() {
-        assertEquals(new BigDecimal("9999"), calculator.calculateFee(new BigDecimal("200000"), Method.CARD));
+        assertEquals(new BigDecimal("4000"), calculator.calculateFee(new BigDecimal("200000"), Method.CARD));
     }
 
     @Test
