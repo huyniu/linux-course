@@ -1,0 +1,43 @@
+name: User Service CI
+on:
+  push:
+    branches:
+      - main
+    # Repo chung nhieu bai: chi chay khi user-service hoac workflow nay thay doi
+    paths:
+      - 'cicd/user-service/**'
+      - '.github/workflows/user-ci.yml'
+jobs:
+  build_job:
+    # [___] 1: runner Linux mien phi cho public repo
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cicd/user-service
+    steps:
+      - name: Checkout code
+        # [___] 2: action chinh thuc tai ma nguon, ban moi nhat tren Marketplace
+        uses: actions/checkout@v7
+
+      - name: Setup Java JDK 17
+        # De bai cho @v4, nang len ban moi nhat vi v4 da bi danh dau deprecated (Node.js 20)
+        uses: actions/setup-java@v6
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build Jar
+        run: |
+          chmod +x ./gradlew
+          ./gradlew bootJar
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: user-service-artifact
+          # [___] 3: bootJar sinh dung 1 file build/libs/user-service-0.0.1-SNAPSHOT.jar.
+          # upload-artifact tinh path tu thu muc goc repo (khong theo working-directory),
+          # nen trong repo chung phai them tien to cicd/user-service/.
+          path: cicd/user-service/build/libs/*.jar
+          if-no-files-found: error
+          retention-days: 3
