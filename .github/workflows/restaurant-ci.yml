@@ -17,15 +17,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7
 
-      - name: Setup Java 17
-        uses: actions/setup-java@v6
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'gradle'
-          cache-dependency-path: |
-            cicd/restaurant-service/*.gradle*
-            cicd/restaurant-service/**/gradle-wrapper.properties
+      # Runner tu quan ly da cai san JDK 17 (JAVA_HOME khai bao trong docker-compose.yml cua runner),
+      # khong can actions/setup-java tai lai JDK moi lan chay.
+      - name: Verify Java 17
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME"
+          "$JAVA_HOME/bin/java" -version 2>&1 | grep -q '"17\.' || { echo "Can JDK 17"; exit 1; }
+          "$JAVA_HOME/bin/java" -version
 
       - name: Show runner info
         run: |

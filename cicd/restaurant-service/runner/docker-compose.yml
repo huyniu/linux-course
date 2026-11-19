@@ -20,10 +20,15 @@ services:
       # Thu muc lam viec cua runner, trung duong dan voi volume ben duoi
       - RUNNER_WORKDIR=/tmp/runner/work
       - DISABLE_AUTO_UPDATE=true
+      # JDK 17 cai san tren may host, job dung truc tiep thay vi tai lai moi lan chay
+      - JAVA_HOME=/opt/jdk-17
     volumes:
       # Cho phep job chay lenh docker (build image...) bang Docker daemon cua may host
       - /var/run/docker.sock:/var/run/docker.sock
       # Noi luu tam ma nguon va file build. Mount cung duong dan o host va container
       # de khi job chay "docker run -v <thu muc>" thi daemon cua host tim thay dung thu muc.
       - /tmp/runner:/tmp/runner
-
+      # Cong cu cai san: JDK 17 cua host (chi doc)
+      - /usr/lib/jvm/java-17-openjdk-amd64:/opt/jdk-17:ro
+      # Bo dem Gradle (wrapper + thu vien) dung chung giua cac lan build
+      - /root/.gradle:/root/.gradle
