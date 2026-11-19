@@ -1,0 +1,40 @@
+name: Restaurant Service CI
+on:
+  # Chi chay khi push (khong chay cho pull_request) de code tu fork khong the chay tren may self-hosted
+  push:
+    paths:
+      - 'cicd/restaurant-service/**'
+      - '.github/workflows/restaurant-ci.yml'
+
+jobs:
+  build:
+    # Chi chay tren self-hosted runner co nhan quickbite-restaurant, khong dung runner cua GitHub
+    runs-on: [self-hosted, linux, quickbite-restaurant]
+    defaults:
+      run:
+        working-directory: cicd/restaurant-service
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v6
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+          cache-dependency-path: |
+            cicd/restaurant-service/*.gradle*
+            cicd/restaurant-service/**/gradle-wrapper.properties
+
+      - name: Show runner info
+        run: |
+          echo "Runner: $RUNNER_NAME ($RUNNER_OS/$RUNNER_ARCH)"
+          echo "Workspace: $GITHUB_WORKSPACE"
+          docker version --format 'Docker server tren host: {{.Server.Version}}'
+
+      - name: Build with Gradle
+        run: |
+          chmod +x ./gradlew
+          ./gradlew bootJar
+          ls -la build/libs

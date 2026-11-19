@@ -1,0 +1,29 @@
+# Self-hosted GitHub Actions runner cho restaurant-service
+# Cach chay:
+#   cp .env.example .env    # dien RUNNER_TOKEN lay tu Settings > Actions > Runners > New self-hosted runner
+#   docker compose up -d
+services:
+  github-runner:
+    image: myoung34/github-runner:latest
+    container_name: quickbite-restaurant-runner
+    restart: unless-stopped
+    # Moi lan khoi dong container se dang ky lai runner (--replace), container dung thi tu go dang ky
+    environment:
+      # Runner thuoc repo nao
+      - REPO_URL=${REPO_URL}
+      # Token dang ky (het han sau 1 gio, chi dung luc dang ky lan dau)
+      - RUNNER_TOKEN=${RUNNER_TOKEN}
+      - RUNNER_NAME=quickbite-restaurant-runner
+      - RUNNER_SCOPE=repo
+      # Nhan rieng de pipeline goi dung runner nay qua runs-on
+      - LABELS=quickbite-restaurant
+      # Thu muc lam viec cua runner, trung duong dan voi volume ben duoi
+      - RUNNER_WORKDIR=/tmp/runner/work
+      - DISABLE_AUTO_UPDATE=true
+    volumes:
+      # Cho phep job chay lenh docker (build image...) bang Docker daemon cua may host
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Noi luu tam ma nguon va file build. Mount cung duong dan o host va container
+      # de khi job chay "docker run -v <thu muc>" thi daemon cua host tim thay dung thu muc.
+      - /tmp/runner:/tmp/runner
+
