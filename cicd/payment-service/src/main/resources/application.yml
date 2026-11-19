@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: payment-service
+  datasource:
+    # Moi truong that truyen DB_URL/DB_USERNAME/DB_PASSWORD tro toi PostgreSQL.
+    # Khong co bien moi truong (vd. khi chay test/build tren CI) thi fallback sang H2 in-memory,
+    # nen khong can dung service PostgreSQL trong pipeline.
+    url: ${DB_URL:jdbc:h2:mem:paymentdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+server:
+  port: 8080
