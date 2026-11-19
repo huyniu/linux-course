@@ -1,0 +1,22 @@
+name: Cart Service CI
+on:
+  push:
+    # Repo chung nhieu bai: chi chay khi cart-service hoac workflow nay thay doi
+    paths:
+      - 'cicd/cart-service/**'
+      - '.github/workflows/cart-ci.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cicd/cart-service
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: temurin
+      - name: Build with Gradle
+        run: ./gradlew bootJar
